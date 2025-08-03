@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "970341708556",
+    "project_id": "istudy-online-course",
+    "storage_bucket": "istudy-online-course.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:970341708556:android:2516b28da06dd6a4114f29",
+        "android_client_info": {
+          "package_name": "com.example.istudy_courses"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4WvKeVzLfByyvrP6brYt05yIYXYJ0gbE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
