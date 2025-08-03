@@ -38,6 +38,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  //next step: update HOME SCREEN LAYOUT
   Future<void> _resetPassword() async {
     if (_emailController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
