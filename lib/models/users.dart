@@ -7,7 +7,7 @@ class Users {
   final String? photoURL;
   final String? phoneNumber;
   final DateTime? dateOfBirth;
-  final String? bio;
+  final String? bio; //gioi thieu ban than
   final List<int> enrolledCourses;
   final DateTime createdAt;
   final DateTime updatedAt;
