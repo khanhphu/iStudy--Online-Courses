@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:istudy_courses/screens/course_detail_screen.dart';
 import 'package:istudy_courses/screens/courses_screen.dart';
 import 'package:istudy_courses/screens/login_screen.dart';
 import 'package:istudy_courses/screens/main_screen.dart';
