@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:istudy_courses/screens/courses_screen.dart';
 import 'package:istudy_courses/screens/main_screen.dart';
 import 'package:istudy_courses/theme/colors.dart';
 
@@ -47,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
+          MaterialPageRoute(builder: (context) => CoursesScreen()),
         );
       }
     } on FirebaseAuthException catch (e) {

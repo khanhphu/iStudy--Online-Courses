@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import 'package:istudy_courses/models/courses.dart';
 import 'package:istudy_courses/models/videos.dart';
 
-
 // Import course model ở đây
 // import '../models/course.dart';
 
@@ -67,6 +66,23 @@ class ApiService {
       }
     } catch (e) {
       throw Exception('Error searching courses: $e');
+    }
+  }
+
+  //Danh sach khoa hoc user dang ky
+  Future<List<Courses>> getEnrolledCourse(List<int> courseIds) async {
+    try {
+      final courses = <Courses>[];
+      for (int id in courseIds) {
+        final course = await getCourseById(id);
+        if (course != null) {
+          courses.add(course);
+        }
+      }
+      return courses;
+    } catch (e) {
+      print('Error fetching enrolled courses: $e');
+      return [];
     }
   }
 

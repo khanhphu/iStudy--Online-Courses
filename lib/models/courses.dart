@@ -7,6 +7,7 @@ class Courses {
   final String category;
   final String desc;
   final int exp;
+  final DateTime? startDate;
   final double price;
 
   Courses({
@@ -18,6 +19,7 @@ class Courses {
     required this.category,
     required this.desc,
     required this.exp,
+    this.startDate,
     required this.price,
   });
 

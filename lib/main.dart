@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:istudy_courses/screens/splashscreen.dart';
+import 'package:istudy_courses/helpers/app_routes.dart';
 import 'package:istudy_courses/theme/theme.dart';
 
 void main() async {
@@ -18,11 +18,8 @@ class MainApp extends StatelessWidget {
       title: 'iStudy',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
-      home: SplashScreen(),
-      //test ui- home_screen
-      //home: const CoursesScreen(),
-      //test course_detail_screen
-      //  home: CourseDetailScreen(),
+      initialRoute: AppRoutes.splash,
+      routes: AppRoutes.routes,
     );
   }
 }
