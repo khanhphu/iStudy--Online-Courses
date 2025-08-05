@@ -66,6 +66,13 @@ class ProfileDrawerMenu extends StatelessWidget {
               Navigator.pushReplacementNamed(context, '/login');
             },
           ),
+          //Dung de xoa du lieu data storage- set lai onBoarding =true de hien thi cac trang onboarding
+          ListTile(
+            leading: const Icon(Icons.cleaning_services),
+            title: const Text('Wipe out'),
+            onTap: () {},
+            //xyu ly sau
+          ),
         ],
       ),
     );

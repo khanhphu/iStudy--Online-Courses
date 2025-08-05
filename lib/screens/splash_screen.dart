@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:istudy_courses/screens/login_page.dart';
+import 'package:istudy_courses/screens/login_screen.dart';
 import '../theme/colors.dart';
-import 'register_page.dart';
+import 'register_screen.dart';
 
 
 class SplashScreen extends StatelessWidget {

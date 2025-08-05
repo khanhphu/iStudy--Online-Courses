@@ -6,6 +6,7 @@ import 'package:istudy_courses/models/courses.dart';
 import 'package:istudy_courses/models/users.dart';
 import 'package:istudy_courses/screens/course_detail_screen.dart';
 import 'package:istudy_courses/services/api_service.dart';
+import 'package:istudy_courses/services/course_enrollment_service.dart';
 import 'package:istudy_courses/services/user_service.dart';
 import 'package:istudy_courses/theme/colors.dart';
 import 'package:istudy_courses/widgets/list_horizontalCourses.dart';
@@ -25,9 +26,11 @@ class _CoursesState extends State<CoursesScreen> {
   List<Courses> filteredCourses = [];
   Users? _currentUser;
   bool isLoading = true;
+  bool isEnrolling = false;
   String errorMessage = '';
   //bool isEnrolled= false;
-  final ApiService _courseService = ApiService();
+  // final ApiService _apiService = ApiService();
+  final CourseEnrollmentService _courseService = CourseEnrollmentService();
   final UserService _userService = UserService();
   final TextEditingController searchController = TextEditingController();
 
@@ -76,7 +79,7 @@ class _CoursesState extends State<CoursesScreen> {
       final user = await _userService.getCurrentUser();
 
       setState(() {
-        courses = courses;
+        courses = fetchedCourses;
         _currentUser = user;
         filteredCourses = fetchedCourses;
         isLoading = false;
@@ -89,6 +92,17 @@ class _CoursesState extends State<CoursesScreen> {
         courses = _getSampleCourses();
         filteredCourses = courses;
       });
+    }
+  }
+
+  Future<void> _reloadUserData() async {
+    try {
+      final user = await _userService.getCurrentUser();
+      setState(() {
+        _currentUser = user;
+      });
+    } catch (e) {
+      print('Error reloading user data: $e');
     }
   }
 
@@ -145,7 +159,11 @@ class _CoursesState extends State<CoursesScreen> {
       endDrawer: const ProfileDrawerMenu(),
       body: SafeArea(
         child: RefreshIndicator(
-          onRefresh: loadCourses,
+          onRefresh: () async {
+            await loadCourses();
+            await _reloadUserData();
+          },
+
           child: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             physics: const BouncingScrollPhysics(),
@@ -376,249 +394,246 @@ class _CoursesState extends State<CoursesScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder:
-          (context) => Container(
-            height: MediaQuery.of(context).size.height * 0.8,
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            child: Column(
-              children: [
-                // Handle bar
-                Container(
-                  margin: EdgeInsets.only(top: 10),
-                  width: 40,
-                  height: 4,
+          (context) => StatefulBuilder(
+            // ✅ Thêm StatefulBuilder để update UI trong modal
+            builder:
+                (context, setModalState) => Container(
+                  height: MediaQuery.of(context).size.height * 0.8,
                   decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2),
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
                   ),
-                ),
-
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Course Image
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
-                          child: Container(
-                            height: 200,
-                            width: double.infinity,
-                            color: Colors.grey[300],
-                            child:
-                                course.img.startsWith('http')
-                                    ? CachedNetworkImage(
-                                      imageUrl: course.img,
-                                      fit: BoxFit.cover,
-                                      placeholder:
-                                          (context, url) => Center(
-                                            child: CircularProgressIndicator(),
-                                          ),
-                                      errorWidget:
-                                          (context, url, error) =>
-                                              Icon(Icons.broken_image),
-                                    )
-                                    : Image.asset(
-                                      course.img,
-                                      fit: BoxFit.cover,
-                                    ),
-                          ),
+                  child: Column(
+                    children: [
+                      // Handle bar
+                      Container(
+                        margin: EdgeInsets.only(top: 10),
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(2),
                         ),
+                      ),
 
-                        SizedBox(height: 20),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              course.name,
-                              style: GoogleFonts.roboto(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.purple,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder:
-                                        (context) => CourseDetailScreen(
-                                          courseId: course.id,
-                                        ),
-                                  ),
-                                );
-                              },
-                              child: Text(
-                                "Xem chi tiết",
-                                style: GoogleFonts.roboto(fontSize: 16),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        SizedBox(height: 10),
-
-                        // Course Info Row
-                        Row(
-                          children: [
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.purple.withOpacity(0.1),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          padding: EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Course Image
+                              ClipRRect(
                                 borderRadius: BorderRadius.circular(15),
-                              ),
-                              child: Text(
-                                course.category,
-                                style: TextStyle(
-                                  color: AppColors.purple,
-                                  fontWeight: FontWeight.w500,
+                                child: Container(
+                                  height: 200,
+                                  width: double.infinity,
+                                  color: Colors.grey[300],
+                                  child:
+                                      course.img.startsWith('http')
+                                          ? CachedNetworkImage(
+                                            imageUrl: course.img,
+                                            fit: BoxFit.cover,
+                                            placeholder:
+                                                (context, url) => Center(
+                                                  child:
+                                                      CircularProgressIndicator(),
+                                                ),
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    Icon(Icons.broken_image),
+                                          )
+                                          : Image.asset(
+                                            course.img,
+                                            fit: BoxFit.cover,
+                                          ),
                                 ),
                               ),
-                            ),
-                            SizedBox(width: 10),
-                            Icon(
-                              Icons.people_alt_outlined,
-                              size: 16,
-                              color: Colors.grey[600],
-                            ),
-                            SizedBox(width: 4),
-                            Text(
-                              course.members.toString(),
-                              style: TextStyle(color: Colors.grey[600]),
-                            ),
-                          ],
-                        ),
 
-                        SizedBox(height: 15),
+                              SizedBox(height: 20),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    course.name,
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.purple,
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) => CourseDetailScreen(
+                                                courseId: course.id,
+                                              ),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      "Xem chi tiết",
+                                      style: GoogleFonts.roboto(fontSize: 16),
+                                    ),
+                                  ),
+                                ],
+                              ),
 
-                        // // Desc
-                        // Row(
-                        //   children: [
-                        //     CircleAvatar(
-                        //       radius: 20,
-                        //       backgroundColor: AppColors.purple.withOpacity(
-                        //         0.1,
-                        //       ),
-                        //       child: Icon(
-                        //         Icons.bolt,
-                        //         color: AppColors.purple,
-                        //       ),
-                        //     ),
-                        //     SizedBox(width: 10),
-                        //     Column(
-                        //       crossAxisAlignment: CrossAxisAlignment.start,
-                        //       children: [],
-                        //     ),
-                        //   ],
-                        // ),
-                        SizedBox(height: 20),
+                              SizedBox(height: 10),
 
-                        // Description
-                        Text(
-                          'Mô tả khóa học',
-                          style: GoogleFonts.roboto(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-
-                        Text(
-                          course.desc,
-                          style: GoogleFonts.roboto(
-                            fontSize: 14,
-                            color: Colors.grey[700],
-                            height: 1.5,
-                          ),
-                        ),
-                        SizedBox(height: 30),
-
-                        // Price and Enroll Button
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Giá khóa học',
-                                  style: GoogleFonts.roboto(
-                                    fontSize: 12,
+                              // Course Info Row
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.purple.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    child: Text(
+                                      course.category,
+                                      style: TextStyle(
+                                        color: AppColors.purple,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  Icon(
+                                    Icons.people_alt_outlined,
+                                    size: 16,
                                     color: Colors.grey[600],
                                   ),
-                                ),
-                                Text(
-                                  course.price == 0
-                                      ? 'Miễn phí'
-                                      : formatCurrency(course.price),
-                                  style: GoogleFonts.roboto(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color:
-                                        course.price == 0
-                                            ? Colors.green
-                                            : AppColors.purple,
+                                  SizedBox(width: 4),
+                                  Text(
+                                    course.members.toString(),
+                                    style: TextStyle(color: Colors.grey[600]),
                                   ),
-                                ),
-                              ],
-                            ),
-                            ElevatedButton(
-                              onPressed: () {
-                                isEnrolled ? null : () => _enrollCourse(course);
-                                Navigator.pop(context);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Đã đăng ký khóa học: ${course.name}',
-                                    ),
-                                    backgroundColor: Colors.green,
-                                  ),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.purple,
-                                foregroundColor: AppColors.white,
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 30,
-                                  vertical: 15,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
+                                ],
                               ),
-                              child: Text(
-                                'Đăng ký ngay',
+
+                              SizedBox(height: 20),
+
+                              // Description
+                              Text(
+                                'Mô tả khóa học',
                                 style: GoogleFonts.roboto(
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                            ),
-                          ],
+                              SizedBox(height: 10),
+
+                              Text(
+                                course.desc,
+                                style: GoogleFonts.roboto(
+                                  fontSize: 14,
+                                  color: Colors.grey[700],
+                                  height: 1.5,
+                                ),
+                              ),
+                              SizedBox(height: 30),
+
+                              // Price and Enroll Button
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Giá khóa học',
+                                        style: GoogleFonts.roboto(
+                                          fontSize: 12,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                      Text(
+                                        course.price == 0
+                                            ? 'Miễn phí'
+                                            : formatCurrency(course.price),
+                                        style: GoogleFonts.roboto(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                          color:
+                                              course.price == 0
+                                                  ? Colors.green
+                                                  : AppColors.purple,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+                                  ElevatedButton(
+                                    onPressed:
+                                        isEnrolled || isEnrolling
+                                            ? null
+                                            : () async {
+                                              await _enrollCourse(
+                                                course,
+                                                setModalState,
+                                              );
+                                            },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          isEnrolled
+                                              ? Colors.grey
+                                              : AppColors.purple,
+                                      foregroundColor: AppColors.white,
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 30,
+                                        vertical: 15,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(25),
+                                      ),
+                                    ),
+                                    child:
+                                        isEnrolling
+                                            ? SizedBox(
+                                              width: 20,
+                                              height: 20,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                valueColor:
+                                                    AlwaysStoppedAnimation<
+                                                      Color
+                                                    >(AppColors.white),
+                                              ),
+                                            )
+                                            : Text(
+                                              isEnrolled
+                                                  ? 'Đã đăng ký'
+                                                  : 'Đăng ký ngay',
+                                              style: GoogleFonts.roboto(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
           ),
     );
   }
 
-  @override
-  void dispose() {
-    searchController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _enrollCourse(Courses course) async {
+  Future<void> _enrollCourse(Courses course, StateSetter setModalState) async {
     if (_currentUser == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -628,5 +643,61 @@ class _CoursesState extends State<CoursesScreen> {
       );
       return;
     }
+
+    // Set loading state
+    setState(() {
+      isEnrolling = true;
+    });
+    setModalState(() {
+      isEnrolling = true;
+    });
+
+    try {
+      // Gọi service đăng ký khóa học
+      bool success = await _courseService.enrollCourse(course.id);
+
+      if (success) {
+        // Reload user data để cập nhật enrolledCourses
+        await _reloadUserData();
+
+        Navigator.pop(context); // Đóng modal
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Đã đăng ký khóa học: ${course.name}'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Không thể đăng ký khóa học. Vui lòng thử lại.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      print('Enrollment error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Lỗi đăng ký khóa học: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      // Reset loading state
+      setState(() {
+        isEnrolling = false;
+      });
+      setModalState(() {
+        isEnrolling = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 }
