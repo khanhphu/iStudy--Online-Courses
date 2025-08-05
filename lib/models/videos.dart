@@ -4,7 +4,7 @@ class Videos {
   final String title;
   final String duration;
   final String thumbnail;
-  final bool isWatched;
+  bool isWatched;
   final bool isLocked;
   final String videoUrl;
 
@@ -28,6 +28,19 @@ class Videos {
       isWatched: json['isWatched'] ?? false,
       isLocked: json['isLocked'] ?? false,
       videoUrl: json['videoUrl']?.toString() ?? '',
+    );
+  }
+
+  Videos copyWith({bool? isWatched}) {
+    return Videos(
+      id: id,
+      title: title,
+      thumbnail: thumbnail,
+      duration: duration,
+      isWatched: isWatched ?? this.isWatched,
+      isLocked: isLocked,
+      courseId: courseId,
+      videoUrl: videoUrl,
     );
   }
 }
