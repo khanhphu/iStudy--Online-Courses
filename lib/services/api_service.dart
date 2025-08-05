@@ -87,33 +87,28 @@ class ApiService {
   }
 
   //Video cua khoa hoc loc theo courseId
-  Future<List<Videos>> fetchVideosByCourseId(int courseId) async {
-    final response = await http.get(
-      Uri.parse(
-        'https://68886162adf0e59551b9b66d.mockapi.io/istudy/courses/videos/?id=${courseId}',
-      ),
-    );
+  // Future<List<Videos>> fetchVideosByCourseId(int courseId) async {
+  //   final response = await http.get(Uri.parse('$baseUrl/videos/?id=$courseId'));
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      return data.map((json) => Videos.fromJson(json)).toList();
-    } else {
-      throw Exception('Failed to load videos');
-    }
-  }
+  //   if (response.statusCode == 200) {
+  //     final List<dynamic> data = json.decode(response.body);
+  //     return data.map((json) => Videos.fromJson(json)).toList();
+  //   } else {
+  //     throw Exception('Failed to load videos');
+  //   }
+  // }
 
   //Fetch video by course id
-  static Future<List<Videos>> fetchVideosbyCourseId(int courseId) async {
+  static Future<List<Videos>> fetchVideosbyCourseId(int id) async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/videos/?id=$courseId'),
-      );
+      final response = await http.get(Uri.parse('$baseUrl/videos/?id=$id'));
+      print("Response body: ${response.body}");
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         return data.map((json) => Videos.fromJson(json)).toList();
       } else {
-        print('No videos found for course: $courseId');
+        print('No videos found for course: $id');
         return [];
       }
     } catch (e) {

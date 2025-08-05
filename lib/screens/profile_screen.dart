@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:istudy_courses/models/courses.dart';
 import 'package:istudy_courses/models/users.dart';
+import 'package:istudy_courses/screens/course_detail_screen.dart';
 import 'package:istudy_courses/screens/edit_profile_screen.dart';
 import 'package:istudy_courses/services/api_service.dart';
 import 'package:istudy_courses/services/user_service.dart';
@@ -314,9 +315,13 @@ class _ProfileScreenState extends State<ProfileScreen>
                 const SizedBox(width: 4),
                 const Text("4"),
                 const SizedBox(width: 16),
-                Icon(Icons.access_time, color: Colors.grey[600], size: 16),
+                Icon(
+                  Icons.access_time_sharp,
+                  color: Colors.grey[600],
+                  size: 16,
+                ),
                 const SizedBox(width: 4),
-                Text('${course.qty}'),
+                Text('${course.startDate}'),
               ],
             ),
           ],
@@ -325,12 +330,12 @@ class _ProfileScreenState extends State<ProfileScreen>
           itemBuilder:
               (context) => [
                 const PopupMenuItem(
-                  value: 'unenroll',
-                  child: Text('Hủy đăng ký'),
+                  value: 'detail',
+                  child: Text('Xem chi tiết'),
                 ),
               ],
           onSelected: (value) {
-            if (value == 'unenroll') _unenrollCourse(course);
+            if (value == 'detail') _navigateToDetailCourse(course.id);
           },
         ),
       ),
@@ -346,6 +351,18 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
     if (result == true) _loadUserData();
   }
+
+  void _navigateToDetailCourse(int courseId) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CourseDetailScreen(courseId: courseId),
+      ),
+    );
+    if (result == true) _loadUserData();
+  }
+
+  // Future<void> _navigateToDetailCourse(course)
 
   Future<void> _unenrollCourse(Courses course) async {
     final confirm = await showDialog<bool>(
