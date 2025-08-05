@@ -3,11 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:istudy_courses/helpers/custom_format.dart';
 import 'package:istudy_courses/models/courses.dart';
+import 'package:istudy_courses/models/users.dart';
 import 'package:istudy_courses/screens/course_detail_screen.dart';
 import 'package:istudy_courses/services/api_service.dart';
+import 'package:istudy_courses/services/user_service.dart';
 import 'package:istudy_courses/theme/colors.dart';
 import 'package:istudy_courses/widgets/list_horizontalCourses.dart';
 import 'package:istudy_courses/widgets/list_verticalCourses.dart';
+import 'package:istudy_courses/widgets/profile_drawer_button.dart';
+import 'package:istudy_courses/widgets/profile_drawer_menu.dart';
 
 class CoursesScreen extends StatefulWidget {
   const CoursesScreen({super.key});
@@ -19,8 +23,12 @@ class CoursesScreen extends StatefulWidget {
 class _CoursesState extends State<CoursesScreen> {
   List<Courses> courses = [];
   List<Courses> filteredCourses = [];
+  Users? _currentUser;
   bool isLoading = true;
   String errorMessage = '';
+  //bool isEnrolled= false;
+  final ApiService _courseService = ApiService();
+  final UserService _userService = UserService();
   final TextEditingController searchController = TextEditingController();
 
   // Sample data cho horizontal courses (có thể thay bằng API sau)
@@ -65,9 +73,11 @@ class _CoursesState extends State<CoursesScreen> {
       });
 
       final fetchedCourses = await ApiService.getCourses();
+      final user = await _userService.getCurrentUser();
 
       setState(() {
         courses = courses;
+        _currentUser = user;
         filteredCourses = fetchedCourses;
         isLoading = false;
       });
@@ -132,6 +142,7 @@ class _CoursesState extends State<CoursesScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: AppColors.purple,
+      endDrawer: const ProfileDrawerMenu(),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: loadCourses,
@@ -139,28 +150,37 @@ class _CoursesState extends State<CoursesScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             physics: const BouncingScrollPhysics(),
             children: [
-              Column(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "iStudy",
-                    style: GoogleFonts.roboto(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.white,
-                      fontSize: 36,
-                    ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "iStudy",
+                        style: GoogleFonts.roboto(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.white,
+                          fontSize: 36,
+                        ),
+                      ),
+                      Text(
+                        "Khóa học",
+                        style: GoogleFonts.roboto(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.white,
+                          fontSize: 36,
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    "Khóa học",
-                    style: GoogleFonts.roboto(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.white,
-                      fontSize: 36,
-                    ),
-                  ),
+                  SizedBox(width: 50),
+                  const ProfileDrawerButton(),
                 ],
               ),
+
               SizedBox(height: 22),
 
               // Horizontal Courses List
@@ -274,10 +294,15 @@ class _CoursesState extends State<CoursesScreen> {
                     MediaQuery.of(context).viewInsets.bottom + 20,
                   ),
                   itemCount: filteredCourses.length,
+
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
                   itemBuilder: (context, index) {
                     final course = filteredCourses[index];
+                    //enroll
+                    final isEnrolled =
+                        _currentUser?.enrolledCourses.contains(course.id) ??
+                        false;
                     return VerticalListCourses(
                       courses: course,
                       crsImg:
@@ -287,7 +312,7 @@ class _CoursesState extends State<CoursesScreen> {
                       crsTitle: course.name,
                       crsMembers: course.members,
                       crsRating: 4.0, // Có thể thêm rating vào model sau
-                      onTap: () => _showCourseDetails(course),
+                      onTap: () => _showCourseDetails(course, isEnrolled),
                     );
                   },
                 ),
@@ -324,7 +349,28 @@ class _CoursesState extends State<CoursesScreen> {
     );
   }
 
-  void _showCourseDetails(Courses course) {
+  void _showNavigationBar(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return NavigationBar(
+          destinations: const [
+            NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+            NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
+          ],
+          selectedIndex: 0,
+          onDestinationSelected: (index) {
+            Navigator.pop(context);
+          },
+        );
+      },
+    );
+  }
+
+  void _showCourseDetails(Courses course, bool isEnrolled) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -525,6 +571,7 @@ class _CoursesState extends State<CoursesScreen> {
                             ),
                             ElevatedButton(
                               onPressed: () {
+                                isEnrolled ? null : () => _enrollCourse(course);
                                 Navigator.pop(context);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
@@ -569,5 +616,17 @@ class _CoursesState extends State<CoursesScreen> {
   void dispose() {
     searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> _enrollCourse(Courses course) async {
+    if (_currentUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Vui lòng đăng nhập để đăng ký khóa học'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
   }
 }
