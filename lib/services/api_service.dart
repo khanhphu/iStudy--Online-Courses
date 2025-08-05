@@ -101,7 +101,9 @@ class ApiService {
   //Fetch video by course id
   static Future<List<Videos>> fetchVideosbyCourseId(int id) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/videos/?id=$id'));
+      final response = await http.get(
+        Uri.parse('$baseUrl/videos/?courseId=$id'),
+      );
       print("Response body: ${response.body}");
 
       if (response.statusCode == 200) {

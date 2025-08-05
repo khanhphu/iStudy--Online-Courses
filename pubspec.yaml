@@ -26,6 +26,8 @@ dependencies:
   json_annotation: ^4.9.0
   flutter_riverpod: ^2.6.1
   img_picker: ^1.0.2
+  video_player: ^2.10.0
+  chewie: ^1.12.1
 
 dev_dependencies:
   flutter_test:

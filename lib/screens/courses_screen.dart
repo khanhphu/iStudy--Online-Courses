@@ -301,7 +301,7 @@ class _CoursesState extends State<CoursesScreen> {
                     ],
                   ),
                 ),
-
+              SizedBox(height: 20),
               // Vertical Courses List
               if (!isLoading)
                 ListView.builder(
@@ -395,7 +395,7 @@ class _CoursesState extends State<CoursesScreen> {
       backgroundColor: Colors.transparent,
       builder:
           (context) => StatefulBuilder(
-            // ✅ Thêm StatefulBuilder để update UI trong modal
+            //
             builder:
                 (context, setModalState) => Container(
                   height: MediaQuery.of(context).size.height * 0.8,
