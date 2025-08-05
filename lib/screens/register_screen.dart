@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:istudy_courses/models/users.dart';
 import '../theme/colors.dart'; // Đảm bảo AppColors.purple có định nghĩa
 
 class RegisterPage extends StatefulWidget {
@@ -92,20 +94,45 @@ class _RegisterPageState extends State<RegisterPage> {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
+      //user lay tu fb
+      User? firebaseUser = userCredential.user;
+      if (firebaseUser != null) {
+        final uid = firebaseUser.uid;
+        //cap nhat display name
 
-      // Sau khi tạo tài khoản, bạn có thể cập nhật thêm displayName
-      await userCredential.user!.updateDisplayName(username);
+        //tao instance model
+        final newUser = Users(
+          uid: uid,
+          email: email,
+          displayName: firebaseUser.displayName,
+          photoURL: firebaseUser.photoURL,
+          phoneNumber: firebaseUser.phoneNumber,
+          dateOfBirth: null,
+          bio: null,
+          enrolledCourses: [],
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+        //luu vao firestore
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .set(newUser.toMap());
 
-      // Thông báo đăng ký thành công
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Đăng ký thành công!')));
-      
-      // Điều hướng hoặc reset form
-      _usernameController.clear();
-      _emailController.clear();
-      _passwordController.clear();
-      _confirmPasswordController.clear();
+        // Thông báo đăng ký thành công
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Đăng ký thành công!')));
+
+        // Điều hướng & reset form
+        _usernameController.clear();
+        _emailController.clear();
+        _passwordController.clear();
+        _confirmPasswordController.clear();
+        Navigator.pushReplacementNamed(context, '/login');
+      } else {
+        return;
+      }
     } on FirebaseAuthException catch (e) {
       setState(() {
         if (e.code == 'email-already-in-use') {
@@ -118,7 +145,7 @@ class _RegisterPageState extends State<RegisterPage> {
       });
     } catch (e) {
       setState(() {
-        _errorMessage = 'Đã xảy ra lỗi không xác định.';
+        _errorMessage = '${e.toString()}';
       });
     }
   }

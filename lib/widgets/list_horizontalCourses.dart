@@ -64,7 +64,7 @@ class MyHorizontalCoursesList extends StatelessWidget {
                 softWrap: true,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.roboto(
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.bold,
                   color: AppColors.white,
                   fontSize: 16,
                 ),

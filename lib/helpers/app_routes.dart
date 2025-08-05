@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:istudy_courses/screens/courses_screen.dart';
-import 'package:istudy_courses/screens/login_page.dart';
+import 'package:istudy_courses/screens/login_screen.dart';
 import 'package:istudy_courses/screens/main_screen.dart';
 import 'package:istudy_courses/screens/profile_screen.dart';
-import 'package:istudy_courses/screens/register_page.dart';
-import 'package:istudy_courses/screens/splashscreen.dart';
+import 'package:istudy_courses/screens/register_screen.dart';
+import 'package:istudy_courses/screens/splash_screen.dart';
 
 class AppRoutes {
   static const String home = '/';
