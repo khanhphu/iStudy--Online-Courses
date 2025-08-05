@@ -20,12 +20,12 @@ class _ProfileScreenState extends State<ProfileScreen>
   final UserService _userService = UserService();
   final ApiService _courseService = ApiService();
   Users? _currentUser;
-  List<Courses> _enrolledCrs = [];
+  List<Courses> _enrolledCourses = [];
   bool _isLoading = true;
   late TabController _tabController;
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _loadUserData();
@@ -33,20 +33,19 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   Future<void> _loadUserData() async {
     setState(() => _isLoading = true);
-
     try {
       final user = await _userService.getCurrentUser();
       if (user != null) {
         final courses = await _courseService.getEnrolledCourse(
           user.enrolledCourses,
-        ); //int
+        );
         setState(() {
           _currentUser = user;
-          _enrolledCrs = courses;
+          _enrolledCourses = courses;
         });
       }
     } catch (e) {
-      print('Error loading user data: $e');
+      debugPrint('Error loading user data: $e');
     } finally {
       setState(() => _isLoading = false);
     }
@@ -57,107 +56,82 @@ class _ProfileScreenState extends State<ProfileScreen>
     return Scaffold(
       backgroundColor: AppColors.light_blue,
       appBar: AppBar(
-        title: Text('Hồ Sơ Cá Nhân'),
+        title: const Text('Hồ Sơ Cá Nhân'),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0,
         actions: [
           IconButton(
-            icon: Icon(Icons.edit),
-            onPressed: () => _navigateToEditProfile(),
+            icon: const Icon(Icons.edit),
+            onPressed: _navigateToEditProfile,
           ),
-
-          IconButton(icon: Icon(Icons.logout), onPressed: () => _signOut()),
+          IconButton(icon: const Icon(Icons.logout), onPressed: _signOut),
         ],
       ),
       body:
           _isLoading
-              ? Center(child: CircularProgressIndicator())
+              ? const Center(child: CircularProgressIndicator())
               : _currentUser == null
-              ? Center(child: Text(" Khong the load thong tin nguoi dung"))
+              ? const Center(child: Text("Không thể tải thông tin người dùng"))
               : RefreshIndicator(
+                onRefresh: _loadUserData,
                 child: SingleChildScrollView(
-                  physics: AlwaysScrollableScrollPhysics(),
+                  physics: const AlwaysScrollableScrollPhysics(),
                   child: Column(
-                    children: [_buildProHeader(), _buildTabSection()],
+                    children: [_buildProfileHeader(), _buildTabSection()],
                   ),
                 ),
-                onRefresh: () => _loadUserData(),
               ),
     );
   }
 
-  Widget _buildProHeader() {
+  Widget _buildProfileHeader() {
     return Container(
       color: Colors.white,
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          Stack(
+          CircleAvatar(
+            radius: 60,
+            backgroundColor: Colors.grey[300],
+            backgroundImage:
+                _currentUser!.photoURL != null
+                    ? CachedNetworkImageProvider(_currentUser!.photoURL!)
+                    : null,
+            child:
+                _currentUser!.photoURL == null
+                    ? Icon(Icons.person, size: 60, color: Colors.grey[600])
+                    : null,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            _currentUser!.displayName ?? 'null',
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            _currentUser!.email,
+            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+          ),
+          if (_currentUser!.bio != null) ...[
+            const SizedBox(height: 12),
+            Text(
+              _currentUser!.bio!,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+            ),
+          ],
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              CircleAvatar(
-                radius: 60,
-                backgroundColor: Colors.grey[300],
-                backgroundImage:
-                    _currentUser!.photoURL != null
-                        ? CachedNetworkImageProvider(_currentUser!.photoURL!)
-                        : null,
-                child:
-                    _currentUser!.photoURL == null
-                        ? Icon(Icons.person, size: 60, color: Colors.grey[600])
-                        : null,
-              ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: Container(
-                  padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(Icons.camera_alt, color: Colors.white, size: 20),
-                ),
-              ),
-              SizedBox(height: 16),
-              //ten- mail
-              Text(
-                _currentUser!.displayName ?? 'null',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              SizedBox(height: 4),
-              Text(
-                _currentUser!.email,
-                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-              ),
-              if (_currentUser!.bio != null) ...[
-                SizedBox(height: 12),
-                Text(
-                  _currentUser!.bio!,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-                ),
-              ],
-              SizedBox(height: 20),
-              //thong ke
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildStartItem('Khóa học', '${_enrolledCrs.length}'),
-                  _buildStartItem(
-                    'Hoàn thành',
-                    '0',
-                  ), // Có thể thêm logic tính toán
-                  _buildStartItem(
-                    'Điểm số',
-                    '0',
-                  ), // Có thể thêm logic tính toán
-                ],
-              ),
+              _buildStatItem('Khóa học', '${_enrolledCourses.length}'),
+              _buildStatItem('Hoàn thành', '0'),
+              _buildStatItem('Điểm số', '0'),
             ],
           ),
         ],
@@ -165,12 +139,12 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
-  Widget _buildStartItem(String label, String value) {
+  Widget _buildStatItem(String label, String value) {
     return Column(
       children: [
         Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: Colors.blue,
@@ -183,7 +157,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   Widget _buildTabSection() {
     return Container(
-      margin: EdgeInsets.only(top: 8),
+      margin: const EdgeInsets.only(top: 8),
       child: Column(
         children: [
           Container(
@@ -192,8 +166,8 @@ class _ProfileScreenState extends State<ProfileScreen>
               controller: _tabController,
               labelColor: Colors.blue,
               tabs: [
-                Tab(text: 'Thông tin'),
-                Tab(text: 'Khóa học (${_enrolledCrs.length})'),
+                const Tab(text: 'Thông tin'),
+                Tab(text: 'Khóa học (${_enrolledCourses.length})'),
               ],
             ),
           ),
@@ -201,7 +175,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             height: 400,
             child: TabBarView(
               controller: _tabController,
-              children: [_buildInforTab(), _buildCoursesTab()],
+              children: [_buildInfoTab(), _buildCoursesTab()],
             ),
           ),
         ],
@@ -209,48 +183,42 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
-  Widget _buildInforTab() {
+  Widget _buildInfoTab() {
     return Container(
       color: Colors.white,
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildInforItem(
-            icon: Icons.phone,
-            title: 'SDT',
-            value: _currentUser!.phoneNumber ?? 'null',
+          _buildInfoItem(
+            Icons.phone,
+            'SĐT',
+            _currentUser!.phoneNumber ?? 'null',
           ),
-          _buildInforItem(
-            icon: Icons.cake,
-            title: 'Ngay sinh',
-            value:
-                _currentUser!.dateOfBirth != null
-                    ? '${_currentUser!.dateOfBirth!.day}/${_currentUser!.dateOfBirth!.month}/${_currentUser!.dateOfBirth!.year}'
-                    : 'null',
+          _buildInfoItem(
+            Icons.cake,
+            'Ngày sinh',
+            _currentUser!.dateOfBirth != null
+                ? '${_currentUser!.dateOfBirth!.day}/${_currentUser!.dateOfBirth!.month}/${_currentUser!.dateOfBirth!.year}'
+                : 'null',
           ),
-          _buildInforItem(
-            icon: Icons.calendar_today,
-            title: 'Ngay tham gia',
-            value:
-                '${_currentUser!.createdAt.day}/${_currentUser!.createdAt.month}/${_currentUser!.createdAt.year}',
+          _buildInfoItem(
+            Icons.calendar_today,
+            'Ngày tham gia',
+            '${_currentUser!.createdAt.day}/${_currentUser!.createdAt.month}/${_currentUser!.createdAt.year}',
           ),
         ],
       ),
     );
   }
 
-  Widget _buildInforItem({
-    required IconData icon,
-    required String title,
-    required String value,
-  }) {
+  Widget _buildInfoItem(IconData icon, String title, String value) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
           Icon(icon, color: Colors.grey[600], size: 20),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -261,7 +229,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                 ),
                 Text(
                   value,
-                  style: TextStyle(fontSize: 16, color: Colors.black87),
+                  style: const TextStyle(fontSize: 16, color: Colors.black87),
                 ),
               ],
             ),
@@ -272,7 +240,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   Widget _buildCoursesTab() {
-    if (_enrolledCrs.isEmpty) {
+    if (_enrolledCourses.isEmpty) {
       return Container(
         color: Colors.white,
         child: Center(
@@ -280,7 +248,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.school, size: 64, color: Colors.grey[400]),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
                 'Chưa đăng ký khóa học nào',
                 style: TextStyle(fontSize: 16, color: Colors.grey[600]),
@@ -293,22 +261,20 @@ class _ProfileScreenState extends State<ProfileScreen>
     return Container(
       color: Colors.grey[50],
       child: ListView.builder(
-        padding: EdgeInsets.all(16),
-        itemCount: _enrolledCrs.length,
-        itemBuilder: (context, index) {
-          final course = _enrolledCrs[index];
-          return _buildCourseCard(course);
-        },
+        padding: const EdgeInsets.all(16),
+        itemCount: _enrolledCourses.length,
+        itemBuilder:
+            (context, index) => _buildCourseCard(_enrolledCourses[index]),
       ),
     );
   }
 
   Widget _buildCourseCard(Courses course) {
     return Card(
-      margin: EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
-        contentPadding: EdgeInsets.all(12),
+        contentPadding: const EdgeInsets.all(12),
         leading: ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: CachedNetworkImage(
@@ -321,54 +287,50 @@ class _ProfileScreenState extends State<ProfileScreen>
                   width: 60,
                   height: 60,
                   color: Colors.grey[300],
-                  child: Icon(Icons.image),
+                  child: const Icon(Icons.image),
                 ),
             errorWidget:
                 (context, url, error) => Container(
                   width: 60,
                   height: 60,
                   color: Colors.grey[300],
-                  child: Icon(Icons.error),
+                  child: const Icon(Icons.error),
                 ),
           ),
         ),
         title: Text(
           course.name,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 4),
-            // Text(
-            //   course.instructor,
-            //   style: TextStyle(color: Colors.grey[600]),
-            // ),
-            // SizedBox(height: 4),
+            const SizedBox(height: 4),
             Row(
               children: [
-                Icon(Icons.star, color: Colors.amber, size: 16),
-                SizedBox(width: 4),
-                Text("4"),
-                SizedBox(width: 16),
+                const Icon(Icons.star, color: Colors.amber, size: 16),
+                const SizedBox(width: 4),
+                const Text("4"),
+                const SizedBox(width: 16),
                 Icon(Icons.access_time, color: Colors.grey[600], size: 16),
-                SizedBox(width: 4),
+                const SizedBox(width: 4),
                 Text('${course.qty}'),
               ],
             ),
           ],
         ),
-        trailing: PopupMenuButton(
+        trailing: PopupMenuButton<String>(
           itemBuilder:
               (context) => [
-                PopupMenuItem(child: Text('Hủy đăng ký'), value: 'unenroll'),
+                const PopupMenuItem(
+                  value: 'unenroll',
+                  child: Text('Hủy đăng ký'),
+                ),
               ],
           onSelected: (value) {
-            if (value == 'unenroll') {
-              _unenrollCourse(course);
-            }
+            if (value == 'unenroll') _unenrollCourse(course);
           },
         ),
       ),
@@ -382,10 +344,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         builder: (context) => EditProfileScreen(currentUser: _currentUser!),
       ),
     );
-
-    if (result == true) {
-      _loadUserData();
-    }
+    if (result == true) _loadUserData();
   }
 
   Future<void> _unenrollCourse(Courses course) async {
@@ -393,38 +352,27 @@ class _ProfileScreenState extends State<ProfileScreen>
       context: context,
       builder:
           (context) => AlertDialog(
-            title: Text('Xác nhận'),
+            title: const Text('Xác nhận'),
             content: Text(
               'Bạn có chắc muốn hủy đăng ký khóa học "${course.name}"?',
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: Text('Hủy'),
+                child: const Text('Hủy'),
               ),
               ElevatedButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: Text('Xác nhận'),
+                child: const Text('Xác nhận'),
               ),
             ],
           ),
     );
-
-    // if (confirm == true) {
-    //   final success = await _userService.u(course.id);
-    //   if (success) {
-    //     ScaffoldMessenger.of(context).showSnackBar(
-    //       SnackBar(content: Text('Đã hủy đăng ký khóa học thành công')),
-    //     );
-    //     _loadUserData();
-    //   } else {
-    //     ScaffoldMessenger.of(context).showSnackBar(
-    //       SnackBar(
-    //         content: Text('Có lỗi xảy ra khi hủy đăng ký'),
-    //         backgroundColor: Colors.red,
-    //       ),
-    //     );
-    //   }
+    if (confirm == true) {
+      // TODO: Implement logic to unenroll
+      // bool success = await _userService.unenroll(course.id);
+      // if (success) _loadUserData();
+    }
   }
 
   Future<void> _signOut() async {
@@ -432,24 +380,23 @@ class _ProfileScreenState extends State<ProfileScreen>
       context: context,
       builder:
           (context) => AlertDialog(
-            title: Text('Đăng xuất'),
-            content: Text('Bạn có chắc muốn đăng xuất?'),
+            title: const Text('Đăng xuất'),
+            content: const Text('Bạn có chắc muốn đăng xuất?'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: Text('Hủy'),
+                child: const Text('Hủy'),
               ),
               ElevatedButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: Text('Đăng xuất'),
+                child: const Text('Đăng xuất'),
               ),
             ],
           ),
     );
-
     if (confirm == true) {
       await FirebaseAuth.instance.signOut();
-      Navigator.of(context).pushReplacementNamed('/login');
+      if (mounted) Navigator.of(context).pushReplacementNamed('/login');
     }
   }
 

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:img_picker/img_picker.dart';
 import 'package:istudy_courses/models/users.dart';
 import 'package:istudy_courses/services/user_service.dart';
+import 'package:istudy_courses/theme/colors.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final Users currentUser;
@@ -43,8 +44,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chỉnh sửa hồ sơ'),
-        backgroundColor: Colors.white,
+        title: Text('Chỉnh sửa hồ sơ', style: TextStyle(color: Colors.black87)),
+        backgroundColor: AppColors.light_blue,
         foregroundColor: Colors.black87,
         elevation: 0,
         actions: [
@@ -157,6 +158,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       controller: controller,
       decoration: InputDecoration(
         labelText: label,
+        labelStyle: TextStyle(color: Colors.grey[600]),
         prefixIcon: Icon(icon),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         filled: true,
@@ -224,6 +226,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           _selectedDate ?? DateTime.now().subtract(Duration(days: 365 * 20)),
       firstDate: DateTime(1950),
       lastDate: DateTime.now(),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            // Custom background
+            colorScheme: ColorScheme.light(
+              primary: Colors.blue, // Header background & selected date
+              onPrimary: Colors.black, // Text on header
+              onSurface: Colors.black, // Default text color
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.blue, // Button text color
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (picked != null) {
@@ -286,3 +306,4 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 }
+//xu ly luu hinh anh voi api sau 
