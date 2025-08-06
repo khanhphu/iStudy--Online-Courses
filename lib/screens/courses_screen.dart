@@ -41,8 +41,8 @@ class _CoursesState extends State<CoursesScreen> {
       'endColor': 0xFF5A4AE4,
       'crsHeadLine': 'Recommend',
       'crsImg': 'assets/uiuxbanner.png',
-      'crsTitle': 'TalkSmart: English Speaking Made Easy',
-      'statusColor': 0xFF5A4AE4,
+      'crsTitle': 'UI/ UX Design for Beginner',
+      'statusColor': 0xFFA16BC3,
     },
     {
       'startColor': 0xFF00FF87,
