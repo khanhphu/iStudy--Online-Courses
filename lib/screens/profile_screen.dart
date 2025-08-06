@@ -148,7 +148,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Colors.blue,
+            color: AppColors.light_purple,
           ),
         ),
         Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
@@ -165,7 +165,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             color: Colors.white,
             child: TabBar(
               controller: _tabController,
-              labelColor: Colors.blue,
+              labelColor: AppColors.light_purple,
               tabs: [
                 const Tab(text: 'Thông tin'),
                 Tab(text: 'Khóa học (${_enrolledCourses.length})'),
@@ -218,7 +218,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
-          Icon(icon, color: Colors.grey[600], size: 20),
+          Icon(icon, color: AppColors.purple, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
