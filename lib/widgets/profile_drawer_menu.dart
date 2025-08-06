@@ -32,7 +32,8 @@ class ProfileDrawerMenu extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  user?.displayName ?? "User",
+                  //  user?.displayName ?? "User",
+                  user?.email.toString() ?? "User",
                   style: const TextStyle(color: Colors.white, fontSize: 18),
                 ),
               ],
