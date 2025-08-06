@@ -54,7 +54,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             child: Text(
               'Lưu',
               style: TextStyle(
-                color: _isLoading ? Colors.grey : Colors.blue,
+                color: _isLoading ? Colors.grey : AppColors.light_purple,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -134,7 +134,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: Container(
                 padding: EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.blue,
+                  color: AppColors.light_purple,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(Icons.camera_alt, color: Colors.white, size: 20),
@@ -159,7 +159,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       decoration: InputDecoration(
         labelText: label,
         labelStyle: TextStyle(color: Colors.grey[600]),
-        prefixIcon: Icon(icon),
+        prefixIcon: Icon(icon, color: AppColors.light_purple),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         filled: true,
         fillColor: Colors.grey[50],
@@ -182,7 +182,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
         child: Row(
           children: [
-            Icon(Icons.cake, color: Colors.grey[600]),
+            Icon(Icons.cake, color: AppColors.light_purple),
             SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -231,13 +231,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           data: Theme.of(context).copyWith(
             // Custom background
             colorScheme: ColorScheme.light(
-              primary: Colors.blue, // Header background & selected date
+              primary:
+                  AppColors.light_purple, // Header background & selected date
               onPrimary: Colors.black, // Text on header
               onSurface: Colors.black, // Default text color
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: Colors.blue, // Button text color
+                foregroundColor: AppColors.light_purple, // Button text color
               ),
             ),
           ),
