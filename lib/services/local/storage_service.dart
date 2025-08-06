@@ -37,14 +37,17 @@ class StorageService {
   }
 
   void saveQuizResult(String uid, Map<String, dynamic> result) {
-    final existing = _box.read(uid) ?? {};
-    existing['quizResults'] = result;
-    _box.write(uid, existing);
+    final key = _prefix('quizResults');
+    final List<Map<String, dynamic>> existing = List<Map<String, dynamic>>.from(
+      _box.read(key) ?? [],
+    );
+    existing.add(result);
+    _box.write(key, existing);
   }
 
-  Map<String, dynamic>? getQuizResult(String uid) {
-    final data = _box.read(uid);
-    return data != null ? data['quizResults'] : null;
+  List<Map<String, dynamic>> getQuizResults(String uid) {
+    final key = _prefix('quizResults');
+    return List<Map<String, dynamic>>.from(_box.read(key) ?? []);
   }
 
   void clearUser(String uid) {
