@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:istudy_courses/screens/course_detail_screen.dart';
 import 'package:istudy_courses/screens/courses_screen.dart';
+import 'package:istudy_courses/screens/exercice_screen.dart';
 import 'package:istudy_courses/screens/login_screen.dart';
 import 'package:istudy_courses/screens/main_screen.dart';
 import 'package:istudy_courses/screens/profile_screen.dart';
@@ -14,6 +15,7 @@ class AppRoutes {
   static const String registeredCourses = '/registered-courses';
   static const String splash = '/splash';
   static const String courses = '/courses';
+  static const String exercise = '/exercise';
 
   static Map<String, WidgetBuilder> routes = {
     splash: (context) => const SplashScreen(),
@@ -22,5 +24,6 @@ class AppRoutes {
     profile: (context) => const ProfileScreen(),
     registeredCourses: (context) => const RegisterPage(),
     courses: (context) => const CoursesScreen(),
+    exercise: (context) => const ExerciseScreen(),
   };
 }
