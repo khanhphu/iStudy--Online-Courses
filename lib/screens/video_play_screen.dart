@@ -1,9 +1,13 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:istudy_courses/controllers/quiz_controller.dart';
+
 import 'package:istudy_courses/helpers/course_item_type_enum.dart';
 import 'package:istudy_courses/models/course_item.dart';
 import 'package:istudy_courses/models/course_lesson.dart';
-import 'package:istudy_courses/screens/exercice_screen.dart';
+import 'package:istudy_courses/screens/quiz_screen.dart';
 import 'package:istudy_courses/theme/colors.dart';
 import 'package:istudy_courses/widgets/course_sidebar.dart';
 import 'package:video_player/video_player.dart';
@@ -54,6 +58,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
 
   // Timer for auto-hiding controls
   Timer? _controlsTimer;
+  //uid
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   @override
   void initState() {
@@ -310,16 +316,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         }
         break;
       case CourseItemType.exercise:
-        //    _showItemDialog(item, 'Đây là nội dung bài tập.');
-        //chuyen den trang bai tap
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => ExerciseScreen()),
-        );
+        _showItemDialog(item, 'Đây là nội dung bài tập.');
+
         break;
       case CourseItemType.quiz:
-        _showItemDialog(item, 'Đây là quiz.');
+        Get.off(() => QuizScreen(uid: _firebaseAuth.currentUser!.uid));
+
         break;
+
       case CourseItemType.document:
         _showItemDialog(item, 'Đây là tài liệu.');
         break;
