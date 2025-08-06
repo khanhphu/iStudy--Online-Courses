@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:istudy_courses/screens/courses_screen.dart';
 import 'package:istudy_courses/screens/main_screen.dart';
+import 'package:istudy_courses/services/local/storage_service.dart';
 import 'package:istudy_courses/theme/colors.dart';
 
 class LoginPage extends StatefulWidget {
@@ -19,6 +20,7 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
   bool _isResetPasswordLoading = false;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  bool _rememberMe = false;
 
   // Validate email format
   bool _isValidEmail(String email) {
@@ -79,6 +81,19 @@ class _LoginPageState extends State<LoginPage> {
       if (mounted) {
         setState(() => _isLoading = false);
       }
+    }
+
+    //
+
+    if (_rememberMe) {
+      StorageService.setRememberMe(true);
+      StorageService.saveCredentials(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+      );
+    } else {
+      StorageService.setRememberMe(false);
+      StorageService.clearCredentials();
     }
   }
 
@@ -281,8 +296,26 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              //   const SizedBox(width: 8),
                             ],
+                            Checkbox(
+                              value: _rememberMe,
+                              activeColor: AppColors.purple,
+                              onChanged: (value) {
+                                setState(() {
+                                  _rememberMe = value ?? false;
+                                });
+                              },
+                            ),
+                            Text(
+                              'Ghi nhớ đăng nhập',
+                              style: GoogleFonts.roboto(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            SizedBox(width: 10),
                             Text(
                               'Quên mật khẩu?',
                               style: GoogleFonts.roboto(

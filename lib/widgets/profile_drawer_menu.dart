@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:istudy_courses/screens/splash_screen.dart';
+import 'package:istudy_courses/services/local/storage_service.dart';
+import 'package:istudy_courses/theme/colors.dart';
 
 class ProfileDrawerMenu extends StatelessWidget {
   const ProfileDrawerMenu({super.key});
@@ -70,7 +73,40 @@ class ProfileDrawerMenu extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.cleaning_services),
             title: const Text('Wipe out'),
-            onTap: () {},
+            onTap: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder:
+                    (_) => AlertDialog(
+                      backgroundColor: AppColors.blur_purple,
+                      title: const Text('Xác nhận'),
+                      content: const Text(
+                        'Bạn có chắc muốn xoá toàn bộ dữ liệu và đặt lại ứng dụng?',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: const Text('Huỷ'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          child: const Text('Đồng ý'),
+                        ),
+                      ],
+                    ),
+              );
+
+              if (confirm == true) {
+                await FirebaseAuth.instance.signOut();
+                await StorageService.resetAll();
+
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SplashScreen()),
+                  (route) => false,
+                );
+              }
+            },
             //xyu ly sau
           ),
         ],
