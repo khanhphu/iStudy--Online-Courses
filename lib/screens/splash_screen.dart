@@ -126,57 +126,6 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
               ),
               const SizedBox(height: 30),
-              // FilledButton(
-              //   onPressed:
-              //       () => Navigator.push(
-              //         context,
-              //         MaterialPageRoute(
-              //           builder: (_) => const LoginPage(),
-              //           settings: const RouteSettings(name: 'LoginPage'),
-              //         ),
-              //       ),
-              //   style: FilledButton.styleFrom(
-              //     minimumSize: const Size.fromHeight(70),
-              //     backgroundColor: Colors.white,
-              //     foregroundColor: AppColors.purple,
-              //     shape: RoundedRectangleBorder(
-              //       borderRadius: BorderRadius.circular(10),
-              //     ),
-              //     textStyle: const TextStyle(
-              //       fontSize: 16,
-              //       fontWeight: FontWeight.w600,
-              //     ),
-              //   ),
-              //   child: const Text("Đăng nhập"),
-              // ),
-              // const SizedBox(height: 15),
-              // OutlinedButton(
-              //   onPressed:
-              //       () => Navigator.push(
-              //         context,
-              //         MaterialPageRoute(
-              //           builder: (_) => const RegisterPage(),
-              //           settings: const RouteSettings(name: 'RegisterPage'),
-              //         ),
-              //       ),
-              //   style: OutlinedButton.styleFrom(
-              //     minimumSize: const Size.fromHeight(70),
-              //     side: const BorderSide(
-              //       color: AppColors.blur_purple,
-              //       width: 1.5,
-              //     ),
-              //     foregroundColor: AppColors.blur_purple,
-              //     shape: RoundedRectangleBorder(
-              //       borderRadius: BorderRadius.circular(10),
-              //     ),
-              //     textStyle: const TextStyle(
-              //       fontSize: 16,
-              //       fontWeight: FontWeight.w600,
-              //       color: AppColors.white,
-              //     ),
-              //   ),
-              //   child: const Text("Đăng ký"),
-              // ),
             ],
           ),
         ),
