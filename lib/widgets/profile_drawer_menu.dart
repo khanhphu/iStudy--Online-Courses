@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
+import 'package:istudy_courses/screens/quiz_history_screen.dart';
 import 'package:istudy_courses/screens/splash_screen.dart';
 import 'package:istudy_courses/services/local/storage_service.dart';
 import 'package:istudy_courses/theme/colors.dart';
@@ -46,10 +48,9 @@ class ProfileDrawerMenu extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.book),
-            title: const Text('Khóa học đã đăng ký'),
+            title: const Text('Lịch sử bài làm'),
             onTap: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, '/courses');
+              Get.to(() => const QuizHistoryScreen());
             },
           ),
           ListTile(

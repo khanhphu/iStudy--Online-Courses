@@ -6,6 +6,7 @@ import 'package:istudy_courses/helpers/app_routes.dart';
 import 'package:istudy_courses/helpers/questions_data.dart';
 import 'package:istudy_courses/models/quiz_question.dart';
 import 'package:istudy_courses/screens/quiz_result_screen.dart';
+import 'package:istudy_courses/services/local/storage_service.dart';
 
 class QuizController extends GetxController {
   final storage = GetStorage();
@@ -71,7 +72,7 @@ class QuizController extends GetxController {
       isAnswered.value = false;
       startTimer();
     } else {
-      print("===> Đã hoàn thành tất cả câu hỏi. Đang chuyển trang...");
+      print(" Đã hoàn thành tất cả câu hỏi. Đang chuyển trang...");
 
       _timer?.cancel();
       saveResult();
@@ -86,6 +87,11 @@ class QuizController extends GetxController {
       "total": allQuestions.length,
       "timestamp": DateTime.now().toIso8601String(),
     };
+
+    StorageService().saveQuizResult(
+      StorageService.currentUID ?? "guest",
+      quizResult,
+    );
 
     final key = "quizResults_$uid";
     final existing = storage.read<List>(key) ?? [];
