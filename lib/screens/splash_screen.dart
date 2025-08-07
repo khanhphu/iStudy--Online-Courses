@@ -83,18 +83,17 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.purple,
-      body: SafeArea(
+      body: Center(
         child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Image.asset(
-                'assets/amico.png', // Thay bằng hình ảnh phù hợp nếu cần
-                // height: MediaQuery.of(context).size.height * 0.3,
-                // width: MediaQuery.of(context).size.width * 0.7,
-                fit: BoxFit.contain,
+                'assets/amico.png',
                 height: 300,
+                fit: BoxFit.contain,
                 errorBuilder:
                     (context, error, stackTrace) => const Icon(
                       Icons.error_outline,
@@ -102,7 +101,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       color: Colors.white70,
                     ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
               Text(
                 'iStudy',
                 style: GoogleFonts.roboto(
@@ -113,9 +112,9 @@ class _SplashScreenState extends State<SplashScreen> {
                   fontSize: 40,
                   letterSpacing: 1.5,
                 ),
+                textAlign: TextAlign.center,
               ),
-
-              const SizedBox(height: 10),
+              const SizedBox(height: 16),
               Text(
                 'Học dễ dàng và nhanh chóng!\nXem video bài giảng mọi lúc, mọi nơi',
                 textAlign: TextAlign.center,
@@ -123,9 +122,9 @@ class _SplashScreenState extends State<SplashScreen> {
                   color: Colors.white70,
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
+                  height: 1.4,
                 ),
               ),
-              const SizedBox(height: 30),
             ],
           ),
         ),

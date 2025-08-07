@@ -5,10 +5,12 @@ import 'package:istudy_courses/helpers/custom_format.dart';
 import 'package:istudy_courses/models/courses.dart';
 import 'package:istudy_courses/models/users.dart';
 import 'package:istudy_courses/screens/course_detail_screen.dart';
+import 'package:istudy_courses/screens/quiz_history_screen.dart';
 import 'package:istudy_courses/services/api_service.dart';
 import 'package:istudy_courses/services/course_enrollment_service.dart';
 import 'package:istudy_courses/services/user_service.dart';
 import 'package:istudy_courses/theme/colors.dart';
+import 'package:istudy_courses/widgets/custom_bottom_nav_bar.dart';
 import 'package:istudy_courses/widgets/list_horizontalCourses.dart';
 import 'package:istudy_courses/widgets/list_verticalCourses.dart';
 import 'package:istudy_courses/widgets/profile_drawer_button.dart';
@@ -33,7 +35,8 @@ class _CoursesState extends State<CoursesScreen> {
   final CourseEnrollmentService _courseService = CourseEnrollmentService();
   final UserService _userService = UserService();
   final TextEditingController searchController = TextEditingController();
-
+  //bottom bar
+  int _currentIndex = 0;
   // Sample data cho horizontal courses (có thể thay bằng API sau)
   final List<Map<String, dynamic>> horizentalCourses = [
     {
@@ -364,6 +367,9 @@ class _CoursesState extends State<CoursesScreen> {
           ),
         ),
       ),
+    ).withBottomNav(
+      currentIndex: _currentIndex,
+      onNavigate: (index) => _handleNavigation(index),
     );
   }
 
@@ -699,5 +705,41 @@ class _CoursesState extends State<CoursesScreen> {
   void dispose() {
     searchController.dispose();
     super.dispose();
+  }
+
+  void _handleNavigation(int index) {
+    if (index == _currentIndex) return; // Don't navigate if same tab
+
+    switch (index) {
+      case 0:
+        // Navigate to Course
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => CoursesScreen()),
+        );
+        break;
+      case 1:
+        // Navigate to History
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => QuizHistoryScreen()),
+        );
+        break;
+      case 2:
+        // Navigate to Schedule
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => QuizHistoryScreen()),
+        );
+        break;
+      case 3:
+        // Already in Course section, could navigate to course list
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => QuizHistoryScreen()),
+        );
+
+        break;
+    }
   }
 }

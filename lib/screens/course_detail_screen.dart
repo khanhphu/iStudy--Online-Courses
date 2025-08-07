@@ -6,11 +6,14 @@ import 'package:istudy_courses/models/course_item.dart';
 import 'package:istudy_courses/models/course_lesson.dart';
 import 'package:istudy_courses/models/users.dart';
 import 'package:istudy_courses/models/videos.dart';
+import 'package:istudy_courses/screens/courses_screen.dart';
+import 'package:istudy_courses/screens/home_screen.dart';
 import 'package:istudy_courses/screens/video_play_screen.dart';
 import 'package:istudy_courses/services/api_service.dart';
 import 'package:istudy_courses/services/course_enrollment_service.dart';
 import 'package:istudy_courses/services/user_service.dart';
 import 'package:istudy_courses/theme/colors.dart';
+import 'package:istudy_courses/widgets/custom_bottom_nav_bar.dart';
 
 class CourseDetailScreen extends StatefulWidget {
   final int courseId;
@@ -30,6 +33,8 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
   // final ApiService _apiService = ApiService();
   final CourseEnrollmentService _courseService = CourseEnrollmentService();
   final UserService _userService = UserService();
+  //bottom bar
+  int _currentIndex = 3;
   @override
   void initState() {
     super.initState();
@@ -389,6 +394,43 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
           );
         },
       ),
+    ).withBottomNav(
+      currentIndex: _currentIndex,
+      onNavigate: (index) => _handleNavigation(index),
     );
+  }
+
+  void _handleNavigation(int index) {
+    if (index == _currentIndex) return; // Don't navigate if same tab
+
+    switch (index) {
+      case 0:
+        // Navigate to Home
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => CoursesScreen()),
+        );
+        break;
+      case 1:
+        // Navigate to Search
+        Navigator.pushNamedAndRemoveUntil(context, '/search', (route) => false);
+        break;
+      case 2:
+        // Navigate to Schedule
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/schedule',
+          (route) => false,
+        );
+        break;
+      case 3:
+        // Already in Course section, could navigate to course list
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/courses',
+          (route) => false,
+        );
+        break;
+    }
   }
 }
